@@ -19,6 +19,7 @@ public class Task_FibonacciSeries {
                 first = second;
                 second = next;
             }
+         scanner.close();
         }
     }
 
