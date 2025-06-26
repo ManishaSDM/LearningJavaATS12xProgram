@@ -1,8 +1,8 @@
-package Tasks.USeElseif;
+package Tasks.Core20ifelse;
 
 import java.util.Scanner;
 
-public class CheckConsoVowel {
+public class isAlpha {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
@@ -14,12 +14,10 @@ public class CheckConsoVowel {
         // Convert to lowercase for comparison
         ch = Character.toLowerCase(ch);
 
-        if (ch == 'a' || ch == 'e' || ch == 'i' || ch == 'o' || ch == 'u') {
-            System.out.println("The character is a vowel.");
-        } else if (Character.isLetter(ch)) {
-            System.out.println("The character is a consonant.");
-        } else {
-            System.out.println("Not a valid alphabet character.");
+        if (Character.isAlphabetic(ch)) {
+            System.out.println("The character is an alphabet.");
+        } else  {
+            System.out.println("Not an alphabet");
         }
     }
 }
