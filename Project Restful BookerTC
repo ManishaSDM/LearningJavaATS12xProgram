@@ -1,0 +1,75 @@
+### ✅ **Functional Test Cases**
+
+| Test Case ID | Test Description                 | Pre-conditions     | Endpoint & Method                 | Input Data         | Test Steps                                | Expected Result                                 | Post-conditions           |
+| ------------ | -------------------------------- | ------------------ | --------------------------------- | ------------------ | ----------------------------------------- | ----------------------------------------------- | ------------------------- |
+| TC\_FT\_01   | Verify successful user creation  | API server running | /users (POST)                     | Valid user JSON    | Send POST request with valid user data    | 201 Created, response body contains user ID     | New user is created in DB |
+| TC\_FT\_02   | Retrieve user details            | User exists        | /users/{id} (GET)                 | User ID            | Send GET request with valid user ID       | 200 OK, response contains correct user data     | None                      |
+| TC\_FT\_03   | Update user info                 | User exists        | /users/{id} (PUT)                 | Updated user JSON  | Send PUT request with updated data        | 200 OK, response reflects changes               | User info updated in DB   |
+| TC\_FT\_04   | Delete user                      | User exists        | /users/{id} (DELETE)              | User ID            | Send DELETE request                       | 204 No Content                                  | User removed from DB      |
+| TC\_BOOK\_01 | Create booking with valid data   | None               | /booking (POST)                   | Valid booking JSON | Send POST request with valid booking data | 200 OK, JSON with bookingid and booking details | Booking created in DB     |
+| TC\_BOOK\_04 | Get all booking IDs              | None               | /booking (GET)                    | None               | Send GET request                          | 200 OK, array of booking IDs                    | None                      |
+| TC\_BOOK\_05 | Filter by firstname              | None               | /booking?firstname=Jim (GET)      | None               | Send GET request                          | 200 OK, filtered IDs                            | None                      |
+| TC\_BOOK\_06 | Filter by checkin date           | None               | /booking?checkin=2018-01-01 (GET) | None               | Send GET request                          | 200 OK, filtered IDs                            | None                      |
+| TC\_BOOK\_07 | Get booking by valid ID          | Booking exists     | /booking/1 (GET)                  | None               | Send GET request                          | 200 OK, booking details JSON                    | None                      |
+| TC\_BOOK\_09 | Update booking with valid token  | Valid token cookie | /booking/\:id (PUT)               | Valid booking JSON | Send PUT request with valid token         | 200 OK, updated details                         | Booking updated in DB     |
+| TC\_BOOK\_12 | Update booking with partial data | Valid token cookie | /booking/\:id (PATCH)             | Partial JSON       | Send PATCH request with partial data      | 200 OK, updated details                         | Booking updated in DB     |
+| TC\_BOOK\_13 | Delete booking with valid token  | Valid token        | /booking/\:id (DELETE)            | None               | Send DELETE request                       | 201 Created or 200 OK                           | Booking deleted from DB   |
+| TC\_PING\_01 | API health check                 | None               | /ping (GET)                       | None               | Send GET request                          | 201 Created, response Created or OK             | None                      |
+
+---
+
+### ❌ **Negative Test Cases**
+
+| Test Case ID | Test Description                  | Pre-conditions     | Endpoint & Method       | Input Data                 | Test Steps          | Expected Result                  | Post-conditions    |
+| ------------ | --------------------------------- | ------------------ | ----------------------- | -------------------------- | ------------------- | -------------------------------- | ------------------ |
+| TC\_NT\_01   | Create user with invalid email    | API server running | /users (POST)           | Invalid email format       | Send POST request   | 400 Bad Request, error message   | No user created    |
+| TC\_NT\_02   | Get non-existent user             | None               | /users/{id} (GET)       | Invalid user ID            | Send GET request    | 404 Not Found                    | None               |
+| TC\_NT\_03   | Unauthorized access               | None               | /users (GET)            | No auth token              | Send GET request    | 401 Unauthorized                 | None               |
+| TC\_BOOK\_02 | Missing required field            | None               | /booking (POST)         | Valid JSON minus firstname | Send POST request   | 400 Bad Request or error message | No booking created |
+| TC\_BOOK\_03 | Invalid date format               | None               | /booking (POST)         | "checkin": "01-01-2018"    | Send POST request   | 400 Bad Request or error message | No booking created |
+| TC\_BOOK\_08 | Get booking by invalid ID         | None               | /booking/99999 (GET)    | None                       | Send GET request    | 404 Not Found or error message   | None               |
+| TC\_BOOK\_10 | Update booking with invalid token | Invalid token      | /booking/\:id (PUT)     | Valid booking JSON         | Send PUT request    | 403 Forbidden or error           | None               |
+| TC\_BOOK\_11 | Update booking without token      | None               | /booking/\:id (PUT)     | Valid booking JSON         | Send PUT request    | 403 Forbidden or error           | None               |
+| TC\_BOOK\_14 | Delete booking with invalid token | Invalid token      | /booking/\:id (DELETE)  | None                       | Send DELETE request | 403 Forbidden or error           | None               |
+| TC\_BOOK\_15 | Delete booking without token      | None               | /booking/\:id (DELETE)  | None                       | Send DELETE request | 403 Forbidden or error           | None               |
+| TC\_BOOK\_16 | Delete non-existent booking       | Valid token        | /booking/99999 (DELETE) | None                       | Send DELETE request | 404 Not Found or error           | None               |
+
+---
+
+### 🔐 **Security Test Cases**
+
+| Test Case ID | Test Description          | Pre-conditions     | Endpoint & Method | Input Data                      | Test Steps        | Expected Result               | Post-conditions |
+| ------------ | ------------------------- | ------------------ | ----------------- | ------------------------------- | ----------------- | ----------------------------- | --------------- |
+| TC\_ST\_01   | Access with invalid token | None               | /users (GET)      | Invalid token                   | Send GET request  | 401 Unauthorized              | None            |
+| TC\_ST\_02   | Access other user’s data  | Two users exist    | /users/{id} (GET) | Token for User A, ID for User B | Send GET request  | 403 Forbidden                 | None            |
+| TC\_ST\_03   | SQL injection attempt     | API server running | /users (POST)     | Malicious input                 | Send POST request | 400 Bad Request, no data leak | None            |
+
+---
+
+### 🚫 **Authentication Test Cases**
+
+| Test Case ID | Test Description               | Pre-conditions | Endpoint & Method | Input Data                                           | Test Steps        | Expected Result                             | Post-conditions |
+| ------------ | ------------------------------ | -------------- | ----------------- | ---------------------------------------------------- | ----------------- | ------------------------------------------- | --------------- |
+| TC\_AUTH\_01 | Valid credentials return token | None           | /auth (POST)      | `{ "username": "admin", "password": "password123" }` | Send POST request | 200 OK, JSON with token                     | None            |
+| TC\_AUTH\_02 | Invalid credentials fail       | None           | /auth (POST)      | `{ "username": "admin", "password": "wrongpass" }`   | Send POST request | 200 OK, JSON without token or error message | None            |
+| TC\_AUTH\_03 | Missing fields                 | None           | /auth (POST)      | `{ "password": "password123" }`                      | Send POST request | 400 Bad Request or error message            | None            |
+| TC\_AUTH\_04 | Empty payload                  | None           | /auth (POST)      | `{}`                                                 | Send POST request | 400 Bad Request or error message            | None            |
+
+---
+
+### 🚀 **Performance Test Cases**
+
+| Test Case ID | Test Description          | Pre-conditions     | Endpoint & Method | Input Data | Test Steps                         | Expected Result                     | Post-conditions |
+| ------------ | ------------------------- | ------------------ | ----------------- | ---------- | ---------------------------------- | ----------------------------------- | --------------- |
+| TC\_PT\_01   | Measure response time     | API server running | /users (GET)      | Valid      | Send GET request                   | Response < 500ms                    | None            |
+| TC\_PT\_02   | Load test (1000 requests) | API server running | /users (GET)      | Valid      | Send 1000 GET requests in parallel | No errors, acceptable response time | None            |
+
+---
+
+### 🧪 **Edge Case Test Cases**
+
+\------------------------|--------------------------|--------------------------------|------------------------------------------------|---------------------|
+\| TC\_ET\_01     | Create user with empty fields        | API server running | /users (POST)          | Empty JSON               | Send POST request             | 400 Bad Request                                | No user created     |
+\| TC\_ET\_02     | Create user with max length fields   | API server running | /users (POST)          | Max length strings       | Send POST request             | 201 Created or 400 Bad Request (if too long)   | User created or error|
+
+
